@@ -216,7 +216,7 @@ gestureexecute(Swipe swipe, int nfingers, Edge edge, Distance distance, ActMode 
                 ((edge == CornerTopLeft || edge == CornerBottomLeft) && gestsarr[i].edge == EdgeLeft) ||
                 ((edge == CornerTopRight || edge == CornerBottomRight) && gestsarr[i].edge == EdgeRight)
                )
-            && (actmode == ActModeReleased || gestsarr[i].actmode == actmode)
+            && gestsarr[i].actmode == actmode
             ) {
             if (verbose) fprintf(stderr, "Execute %s\n", gestsarr[i].command);
             ret = system(gestsarr[i].command);
@@ -348,7 +348,10 @@ touchmotion(struct libinput_event *e)
                 ((now.tv_sec - timedown.tv_sec) * 1000000 + (now.tv_nsec - timedown.tv_nsec) / 1000) / 1000
             ) {
                 if (verbose) fprintf(stderr, "(Attempting to find matching pressed gesture)\n");
-                if (gestureexecute(swipe, nfdown, edge, DistanceAny, ActModePressed)) {
+                Distance distance = gesturecalculatedistance(  
+                    xstart[slot], ystart[slot], xend[slot], yend[slot], swipe  
+                );  
+                if (gestureexecute(swipe, nfdown, edge, distance, ActModePressed)) {
                     if (verbose) fprintf(stderr, "(Pressed gesture Executed)\n");
                     xstart[slot] = xend[slot];
                     ystart[slot] = yend[slot];
